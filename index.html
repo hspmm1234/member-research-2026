@@ -28,13 +28,13 @@
       color: var(--ink);
       font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       line-height: 1.5;
-      overflow-x: hidden;
+      
     }
     .scale-wrapper {
       width: 100%;
       display: flex;
       justify-content: center;
-      overflow-x: hidden;
+      
       padding: 16px 0;
     }
     .container {
@@ -5285,14 +5285,22 @@ The summary ...</div>
       const container = document.querySelector('.container');
       const wrapper = document.getElementById('scale-wrapper');
       if (!container || !wrapper) return;
-      const screenWidth = window.innerWidth;
+      
+      const screenWidth = document.documentElement.clientWidth || window.innerWidth;
       const targetWidth = 880;
+      
+      // 手機端視圖縮放：預留左右共 28px 安全邊距，保證左右邊框與陰影 100% 完整露出，絕不裁剪！
       if (screenWidth < targetWidth) {
-        const scale = (screenWidth - 16) / targetWidth;
+        const scale = (screenWidth - 28) / targetWidth;
         container.style.transform = 'scale(' + scale + ')';
         container.style.transformOrigin = 'top center';
-        const actualHeight = container.getBoundingClientRect().height;
-        wrapper.style.height = actualHeight + 'px';
+        
+        // 精確同步縮放後的高寬，讓版面置中且不產生任何水平滾動
+        const rect = container.getBoundingClientRect();
+        wrapper.style.height = rect.height + 'px';
+        wrapper.style.width = '100%';
+        wrapper.style.display = 'flex';
+        wrapper.style.justifyContent = 'center';
       } else {
         container.style.transform = 'none';
         wrapper.style.height = 'auto';
@@ -5302,6 +5310,7 @@ The summary ...</div>
     window.addEventListener('orientationchange', autoScaleA4);
     document.addEventListener('DOMContentLoaded', autoScaleA4);
     setTimeout(autoScaleA4, 100);
+    setTimeout(autoScaleA4, 500); // 確保圖片與資源就緒後再次精確校準
   </script>
 
 </body>
